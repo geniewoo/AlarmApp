@@ -3,6 +3,7 @@
     <string name="alarm_list_name">알람</string>
     <string name="alarm_list_cancel">취소</string>
     <string name="alarm_list_confirm">생성</string>
+    <string name="alarm_list_change">변경</string>
 
     <string name="day_sunday">일</string>
     <string name="day_monday">월</string>
@@ -15,6 +16,6 @@
     <string name="detail_memo">메모</string>
 
     <string name="intent_isCreate">ISCREATE</string>
-
+    <string name="intent_alarmIndex">ALARMINDEX</string>
     <string name="expected_error">오류</string>
 </resources>

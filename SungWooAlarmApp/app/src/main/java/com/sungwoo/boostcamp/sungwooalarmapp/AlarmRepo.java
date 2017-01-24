@@ -8,18 +8,19 @@ import io.realm.RealmObject;
 
 public class AlarmRepo extends RealmObject {
     private int hour, minute;
-    private String dayString;
+    private String dayOfWeekStr;
     private boolean isActive;
+
 
     public AlarmRepo() {
     }
 
-    public AlarmRepo(int hour, int minute, String dayString){
+    public AlarmRepo(int hour, int minute, String dayOfWeekStr, boolean isActive) {
         this.hour = hour;
         this.minute = minute;
-        this.dayString = dayString;
+        this.dayOfWeekStr = dayOfWeekStr;
+        this.isActive = isActive;
     }
-
 
     public int getHour() {
         return hour;
@@ -37,19 +38,19 @@ public class AlarmRepo extends RealmObject {
         this.minute = minute;
     }
 
-    public String getDayString() {
-        return dayString;
+    public String getDayOfWeekStr() {
+        return dayOfWeekStr;
     }
 
-    public boolean getIsActive() {
+    public void setDayOfWeekStr(String dayOfWeekStr) {
+        this.dayOfWeekStr = dayOfWeekStr;
+    }
+
+    public boolean isActive() {
         return isActive;
     }
 
-    public void setIsActive(boolean active) {
+    public void setActive(boolean active) {
         isActive = active;
-    }
-
-    public void setDayString(String dayString) {
-        this.dayString = dayString;
     }
 }

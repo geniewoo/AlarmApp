@@ -62,7 +62,7 @@ public class AlarmListActivity extends AppCompatActivity {
         for (AlarmRepo repo : realmList) {
             result.append("hour : " + repo.getHour() + "\n");
             result.append("minute : " + repo.getMinute() + "\n");
-            result.append("day : " + repo.getDayString() + "\n\n");
+            result.append("day : " + repo.getDayOfWeekStr() + "\n\n");
         }
         listRepoDebug.setText(result.toString());
     }

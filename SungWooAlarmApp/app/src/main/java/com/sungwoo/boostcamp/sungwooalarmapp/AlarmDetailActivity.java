@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -22,8 +23,7 @@ import io.realm.Realm;
 public class AlarmDetailActivity extends AppCompatActivity {
     int hour;
     int minute;
-    String dayStr;
-    int dayIndex;
+    String dayOfWeekStr = "XXXXXXX";
 
     Realm realm;
 
@@ -43,6 +43,8 @@ public class AlarmDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_alarm_detail);
 
+        realm = Realm.getDefaultInstance();
+
         ButterKnife.bind(this);
 
         detailTimePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
@@ -51,40 +53,19 @@ public class AlarmDetailActivity extends AppCompatActivity {
                 whenTimeChanged(i, i1);
             }
         });
-
-        for (TextView textView : day_TVs) {
+        for(int i = 0 ; i < day_TVs.size() ; i ++ ){
+            TextView textView = day_TVs.get(i);
+            textView.setTag(i);
             textView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    switch (view.getId()) {
-                        case R.id.day_sun:
-                            dayStr = getString(R.string.day_sunday);
-                            changeDayColor(0);
-                            break;
-                        case R.id.day_mon:
-                            dayStr = getString(R.string.day_monday);
-                            changeDayColor(1);
-                            break;
-                        case R.id.day_tue:
-                            dayStr = getString(R.string.day_tuesday);
-                            changeDayColor(2);
-                            break;
-                        case R.id.day_wed:
-                            dayStr = getString(R.string.day_wednesday);
-                            changeDayColor(3);
-                            break;
-                        case R.id.day_thu:
-                            dayStr = getString(R.string.day_thursday);
-                            changeDayColor(4);
-                            break;
-                        case R.id.day_fri:
-                            dayStr = getString(R.string.day_friday);
-                            changeDayColor(5);
-                            break;
-                        case R.id.day_sat:
-                            dayStr = getString(R.string.day_saturday);
-                            changeDayColor(6);
-                            break;
+                    int index = (int)view.getTag();
+                    if (dayOfWeekStr.charAt(index)=='X') {
+                        dayOfWeekStr = dayOfWeekStr.substring(0, index) + "O" + dayOfWeekStr.substring(index +1);
+                        changeDayColor(index, true);
+                    }else {
+                        dayOfWeekStr = dayOfWeekStr.substring(0, index) + "X" + dayOfWeekStr.substring(index +1);
+                        changeDayColor(index, false);
                     }
                 }
             });
@@ -113,13 +94,29 @@ public class AlarmDetailActivity extends AppCompatActivity {
                 });
 
                 initSettings();
+            } else {
+                isCreate = false;
+                detailTBLeft_TV.setText(R.string.alarm_list_cancel);
+                detailTBRight_TV.setText(R.string.alarm_list_change);
+
+                if(intent.hasExtra(getString(R.string.intent_alarmIndex))){
+                    int index = intent.getIntExtra(getString(R.string.intent_alarmIndex), -1);
+                    if(index != -1){
+                        List<AlarmRepo> alarmRepos = realm.where(AlarmRepo.class).findAll();
+                        Log.d("alarmDetailActivity", "index : " + index + " num : " + alarmRepos.size());
+                        AlarmRepo alarmRepo = alarmRepos.get(index);
+                        changeSetting(alarmRepo);
+                    }else{
+                        Toast.makeText(this, "error!!!!", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
             }
         } else {
             detailTBLeft_TV.setText(R.string.expected_error);
             detailTBRight_TV.setText(R.string.expected_error);
         }
 
-        realm = Realm.getDefaultInstance();
     }
 
     void whenTimeChanged(int h, int m) {
@@ -159,7 +156,7 @@ public class AlarmDetailActivity extends AppCompatActivity {
     }
 
     AlarmRepo makeAlarmRepo() {
-        AlarmRepo alarmRepo = new AlarmRepo(hour, minute, dayStr);
+        AlarmRepo alarmRepo = new AlarmRepo(hour, minute, dayOfWeekStr, true);
         return alarmRepo;
     }
 
@@ -173,42 +170,59 @@ public class AlarmDetailActivity extends AppCompatActivity {
         }
 
         Calendar c = Calendar.getInstance();
-        dayIndex = 0;
         switch (c.get(Calendar.DAY_OF_WEEK)) {
             case Calendar.SUNDAY:
-                dayStr = getString(R.string.day_sunday);
-                changeDayColor(0);
+                dayOfWeekStr = "OXXXXXX";
+                changeDayColor(0, true);
                 break;
             case Calendar.MONDAY:
-                dayStr = getString(R.string.day_monday);
-                changeDayColor(1);
+                dayOfWeekStr = "XOXXXXX";
+                changeDayColor(1, true);
                 break;
             case Calendar.TUESDAY:
-                dayStr = getString(R.string.day_tuesday);
-                changeDayColor(2);
+                dayOfWeekStr = "XXOXXXX";
+                changeDayColor(2, true);
                 break;
             case Calendar.WEDNESDAY:
-                dayStr = getString(R.string.day_wednesday);
-                changeDayColor(3);
+                dayOfWeekStr = "XXXOXXX";
+                changeDayColor(3, true);
                 break;
             case Calendar.THURSDAY:
-                dayStr = getString(R.string.day_thursday);
-                changeDayColor(4);
+                dayOfWeekStr = "XXXXOXX";
+                changeDayColor(4, true);
                 break;
             case Calendar.FRIDAY:
-                dayStr = getString(R.string.day_friday);
-                changeDayColor(5);
+                dayOfWeekStr = "XXXXXOX";
+                changeDayColor(5, true);
                 break;
             case Calendar.SATURDAY:
-                dayStr = getString(R.string.day_saturday);
-                changeDayColor(6);
+                dayOfWeekStr = "XXXXXXO";
+                changeDayColor(6, true);
                 break;
         }
     }
 
-    void changeDayColor(int index){
-        day_TVs.get(dayIndex).setBackgroundColor(Color.TRANSPARENT);
-        dayIndex = index;
-        day_TVs.get(dayIndex).setBackgroundColor(Color.MAGENTA);
+    void changeDayColor(int index, boolean isActive) {
+        if(isActive) {
+            day_TVs.get(index).setBackgroundColor(Color.MAGENTA);
+        }else{
+            day_TVs.get(index).setBackgroundColor(Color.TRANSPARENT);
+        }
+    }
+
+    void changeSetting(AlarmRepo alarmRepo){
+        Log.d("changeSetting", "changeSetting");
+        if (Build.VERSION.SDK_INT >= 23) {
+            Log.d("changeSetting", "changeSetting1");
+            detailTimePicker.setHour(alarmRepo.getHour());
+            detailTimePicker.setMinute(alarmRepo.getMinute());
+        }
+        dayOfWeekStr = alarmRepo.getDayOfWeekStr();
+
+        for(int i = 0 ; i < day_TVs.size() ; i ++ ){
+            if(dayOfWeekStr.charAt(i) == 'O'){
+                changeDayColor(i, true);
+            }
+        }
     }
 }
