@@ -15,6 +15,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import io.realm.Realm;
 
 /**
  * Created by psw10 on 2017-01-24.
@@ -23,11 +24,17 @@ import butterknife.ButterKnife;
 public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.AlarmListViewHolder> {
     List<AlarmRepo> alarmRepos;
     Context mContext;
+    Realm realm;
     static final int LIST_INDEX = 100;
 
-    public AlarmListAdapter(List<AlarmRepo> alarmRepos) {
+    public AlarmListAdapter(List<AlarmRepo> alarmRepos, Realm realm) {
+        this.realm = realm;
         this.alarmRepos = alarmRepos;
         Log.d(this.toString(),"adapter" + " " + alarmRepos.size());
+    }
+
+    public void setRealm(Realm realm) {
+        this.realm = realm;
     }
 
     @Override
@@ -47,9 +54,12 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
     public void onBindViewHolder(AlarmListViewHolder holder, int position) {
         holder.alarmTimeTV.setText(alarmRepos.get(position).getHour() + " : " + alarmRepos.get(position).getMinute());
         holder.alarmTimeTV.setTag(position);
+        holder.alarmTimeTV.setTag(position);
+        holder.alarmActiveIV.setTag(position);
+        holder.itemView.setTag(position);
         holder.alarmDayOfWeekTV.setText(alarmRepos.get(position).getDayOfWeekStr());
         if(alarmRepos.get(position).isActive()){
-            holder.alarmActiveIV.setImageResource(android.R.drawable.presence_audio_away);
+            holder.alarmActiveIV.setImageResource(android.R.drawable.presence_away);
         }else {
             holder.alarmActiveIV.setImageResource(android.R.drawable.ic_lock_idle_alarm);
         }
@@ -57,10 +67,21 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
         holder.alarmTimeTV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(mContext, AlarmDetailActivity.class);
-                intent.putExtra(mContext.getString(R.string.intent_isCreate), false);
-                intent.putExtra(mContext.getString(R.string.intent_alarmIndex), (int)view.getTag());
-                mContext.startActivity(intent);
+                startChangeActivity(view);
+            }
+        });
+
+        holder.alarmTimeTV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startChangeActivity(view);
+            }
+        });
+
+        holder.alarmActiveIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                changeActiveImage(view);
             }
         });
     }
@@ -68,6 +89,35 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
     @Override
     public int getItemCount() {
         return alarmRepos.size();
+    }
+
+    void changeActiveImage(View view){
+        ImageView imageView = (ImageView)view;
+        int index = (int)view.getTag();
+        if(alarmRepos.get(index).isActive()){
+            imageView.setImageResource(android.R.drawable.ic_lock_idle_alarm);
+            if(realm!=null){
+                realm.beginTransaction();
+                alarmRepos.get(index).setActive(false);
+                realm.commitTransaction();
+                Toast.makeText(mContext, mContext.getString(R.string.alarm_inactive), Toast.LENGTH_SHORT).show();
+            }
+        }else {
+            imageView.setImageResource(android.R.drawable.presence_away);
+            if(realm!=null){
+                realm.beginTransaction();
+                alarmRepos.get(index).setActive(true);
+                realm.commitTransaction();
+                Toast.makeText(mContext, mContext.getString(R.string.alarm_active), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    void startChangeActivity(View view){
+        Intent intent = new Intent(mContext, AlarmDetailActivity.class);
+        intent.putExtra(mContext.getString(R.string.intent_isCreate), false);
+        intent.putExtra(mContext.getString(R.string.intent_alarmIndex), (int)view.getTag());
+        mContext.startActivity(intent);
     }
 
     class AlarmListViewHolder extends RecyclerView.ViewHolder{

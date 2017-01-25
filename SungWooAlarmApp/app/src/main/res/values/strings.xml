@@ -4,6 +4,8 @@
     <string name="alarm_list_cancel">취소</string>
     <string name="alarm_list_confirm">생성</string>
     <string name="alarm_list_change">변경</string>
+    <string name="alarm_active">설정</string>
+    <string name="alarm_inactive">해제</string>
 
     <string name="day_sunday">일</string>
     <string name="day_monday">월</string>
@@ -15,7 +17,14 @@
 
     <string name="detail_memo">메모</string>
 
+    <string name="stop_playing">끄기</string>
+
     <string name="intent_isCreate">ISCREATE</string>
     <string name="intent_alarmIndex">ALARMINDEX</string>
+    <string name="intent_isStart">ALARMSTART</string>
+    <string name="intent_id">INTENTID</string>
     <string name="expected_error">오류</string>
+
+    <string name="pref_ID">PREFID</string>
+    <string name="pref_alarm">PREFALARM</string>
 </resources>
