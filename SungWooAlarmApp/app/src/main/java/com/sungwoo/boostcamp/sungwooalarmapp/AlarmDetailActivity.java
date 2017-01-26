@@ -25,6 +25,9 @@ import butterknife.BindViews;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 
+import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.DAY1MILLIS;
+import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.WEEK1MILLIS;
+
 public class AlarmDetailActivity extends AppCompatActivity {
     final static String TAG = AlarmDetailActivity.class.toString();
     int mId;
@@ -130,7 +133,6 @@ public class AlarmDetailActivity extends AppCompatActivity {
                             detailCancelClicked();
                         }
                     });
-
                     detailTBRight_TV.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
@@ -139,7 +141,6 @@ public class AlarmDetailActivity extends AppCompatActivity {
                         }
                     });
                 }
-
             }
         } else {
             detailTBLeft_TV.setText(R.string.expected_error);
@@ -257,9 +258,9 @@ public class AlarmDetailActivity extends AppCompatActivity {
     }
 
     void detailChangeTVClicked(int index) {
-        if(mAlarmRepos != null){
+        if (mAlarmRepos != null) {
             AlarmRepo alarmRepo = mAlarmRepos.get(index);
-            if(realm!=null){
+            if (realm != null) {
                 realm.beginTransaction();
                 alarmRepo.setHour(hour);
                 alarmRepo.setMinute(minute);
@@ -268,37 +269,109 @@ public class AlarmDetailActivity extends AppCompatActivity {
                 alarmRepo.setMemoStr(detailMemo_ET.getText().toString());
                 realm.commitTransaction();
             }
-
         }
+        unregistWithAlarmManager("OOOOOOO", mId);
+        registWithAlarmManager();
     }
 
     int makeID() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int new_ID = sharedPreferences.getInt(getString(R.string.pref_ID), 0);
-        mId = new_ID;
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        new_ID++;
+        mId = ++new_ID;
         editor.putInt(getString(R.string.pref_ID), new_ID);
         Log.d("new_ID", String.valueOf(new_ID));
         editor.commit();
         return new_ID;
     }
 
-    void registWithAlarmManager(){
-        AlarmManager alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+    void registWithAlarmManager() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmBroadcastReceiver.class);
         intent.putExtra(getString(R.string.intent_isStart), true);
 
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, mId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        Log.d(TAG, "Week1Millis : " + WEEK1MILLIS + " Day1MIillis : " + DAY1MILLIS);
+        for (int i = 0; i < dayOfWeekStr.length(); i++) {
+            if (dayOfWeekStr.charAt(i) == 'O') {
+                int requestCode = mId * 10 + i;
 
-        Calendar calendar = Calendar.getInstance();
-        //TODO 이따가 여기다가 요일 O개수만큼 for를 돌려서 등록할것임 intent에 어떤 값을 넣어서 구별할것인지 추후 생각해보기
-        calendar.set(calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH),
-                calendar.get(Calendar.DATE),
-                hour,
-                minute);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), pendingIntent);
-        Log.d(TAG, "Alarmregisted");
+                Log.d("multi", "regist pending requestCode : " + requestCode);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                Calendar calendar = Calendar.getInstance();
+
+                int nextDay = getNextDay(calendar, i);
+
+                Log.d(TAG, "nextDay : " + nextDay);
+
+                calendar.set(calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DATE),
+                        hour,
+                        minute);
+
+                long targetMillis = calendar.getTimeInMillis() + DAY1MILLIS * nextDay;
+                long nowMillis = System.currentTimeMillis();
+
+                Log.d(TAG, " targetMillies : " + targetMillis + " nowMillis : " + nowMillis);
+
+                long delayMillis = targetMillis - nowMillis;
+
+                if (delayMillis < 0) {
+                    targetMillis += WEEK1MILLIS;
+                }
+
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, targetMillis, WEEK1MILLIS, pendingIntent);
+                Log.d(TAG, "Alarmregisted");
+            }
+        }
+    }
+
+    public static int getNextDay(Calendar calendar, int targetDayOfWeek) {
+        int dayOfWeekInt;
+        switch (calendar.get(Calendar.DAY_OF_WEEK)) {
+            case Calendar.SUNDAY:
+                dayOfWeekInt = 0;
+                break;
+            case Calendar.MONDAY:
+                dayOfWeekInt = 1;
+                break;
+            case Calendar.TUESDAY:
+                dayOfWeekInt = 2;
+                break;
+            case Calendar.WEDNESDAY:
+                dayOfWeekInt = 3;
+                break;
+            case Calendar.THURSDAY:
+                dayOfWeekInt = 4;
+                break;
+            case Calendar.FRIDAY:
+                dayOfWeekInt = 5;
+                break;
+            case Calendar.SATURDAY:
+                dayOfWeekInt = 6;
+                break;
+            default:
+                dayOfWeekInt = -1;
+        }
+        Log.d(TAG, "dayOfWeekInt : " + dayOfWeekInt);
+        return targetDayOfWeek - dayOfWeekInt;
+    }
+    void unregistWithAlarmManager(String dayOfWeekStr, int id) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlarmBroadcastReceiver.class);
+        intent.putExtra(getString(R.string.intent_isStart), true);
+
+        for (int i = 0; i < dayOfWeekStr.length(); i++) {
+            if (dayOfWeekStr.charAt(i) == 'O') {
+                int requestCode = id * 10 + i;
+                Log.d("multi", "adapter unregist pending requestCode : " + requestCode);
+
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                alarmManager.cancel(pendingIntent);
+                Log.d(TAG, "AlarmUnregisted");
+            }
+        }
     }
 }

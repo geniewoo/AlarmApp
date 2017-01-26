@@ -25,6 +25,9 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
+        if(!intent.hasExtra(context.getString(R.string.intent_isStart))){
+            return;
+        }
         Intent serviceIntent = new Intent(context,AlarmService.class);
         serviceIntent.putExtra(context.getString(R.string.intent_isStart), intent.getBooleanExtra(context.getString(R.string.intent_isStart), false));
         Log.d(TAG, "BroadcastReceiver");

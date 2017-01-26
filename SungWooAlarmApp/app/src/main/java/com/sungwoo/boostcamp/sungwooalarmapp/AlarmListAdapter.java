@@ -1,5 +1,7 @@
 package com.sungwoo.boostcamp.sungwooalarmapp;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -11,21 +13,29 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 
+import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmDetailActivity.getNextDay;
+import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.DAY1MILLIS;
+import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.WEEK1MILLIS;
+
 /**
  * Created by psw10 on 2017-01-24.
  */
 
 public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.AlarmListViewHolder> {
+    final String TAG = AlarmListActivity.class.toString();
     List<AlarmRepo> alarmRepos;
     Context mContext;
     Realm realm;
     static final int LIST_INDEX = 100;
+
+
 
     public AlarmListAdapter(List<AlarmRepo> alarmRepos, Realm realm) {
         this.realm = realm;
@@ -81,7 +91,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
         holder.alarmActiveIV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                changeActiveImage(view);
+                changeActive(view);
             }
         });
     }
@@ -91,7 +101,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
         return alarmRepos.size();
     }
 
-    void changeActiveImage(View view){
+    void changeActive(View view){
         ImageView imageView = (ImageView)view;
         int index = (int)view.getTag();
         if(alarmRepos.get(index).isActive()){
@@ -101,6 +111,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
                 alarmRepos.get(index).setActive(false);
                 realm.commitTransaction();
                 Toast.makeText(mContext, mContext.getString(R.string.alarm_inactive), Toast.LENGTH_SHORT).show();
+                unregistWithAlarmManager(alarmRepos.get(index).getDayOfWeekStr(), alarmRepos.get(index).getId());
             }
         }else {
             imageView.setImageResource(android.R.drawable.presence_away);
@@ -109,6 +120,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
                 alarmRepos.get(index).setActive(true);
                 realm.commitTransaction();
                 Toast.makeText(mContext, mContext.getString(R.string.alarm_active), Toast.LENGTH_SHORT).show();
+                registWithAlarmManager(alarmRepos.get(index).getDayOfWeekStr(), alarmRepos.get(index).getId(), alarmRepos.get(index).getHour(), alarmRepos.get(index).getMinute());
             }
         }
     }
@@ -131,6 +143,65 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
         public AlarmListViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this, itemView);
+        }
+    }
+
+    void unregistWithAlarmManager(String dayOfWeekStr, int id) {
+        AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(mContext, AlarmBroadcastReceiver.class);
+        intent.putExtra(mContext.getString(R.string.intent_isStart), true);
+
+        for (int i = 0; i < dayOfWeekStr.length(); i++) {
+            if (dayOfWeekStr.charAt(i) == 'O') {
+                int requestCode = id * 10 + i;
+                Log.d("multi", "adapter unregist pending requestCode : " + requestCode);
+
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                alarmManager.cancel(pendingIntent);
+                Log.d(TAG, "AlarmUnregisted");
+            }
+        }
+    }
+
+    void registWithAlarmManager(String dayOfWeekStr, int mId, int hour, int minute) {
+        AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(mContext, AlarmBroadcastReceiver.class);
+        intent.putExtra(mContext.getString(R.string.intent_isStart), true);
+        Log.d(TAG, "Week1Millis : " + WEEK1MILLIS + " Day1MIillis : " + DAY1MILLIS);
+        for (int i = 0; i < dayOfWeekStr.length(); i++) {
+            if (dayOfWeekStr.charAt(i) == 'O') {
+                int requestCode = mId * 10 + i;
+                Log.d("multi", "adapter regist pending requestCode : " + requestCode);
+
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                Calendar calendar = Calendar.getInstance();
+
+                int nextDay = getNextDay(calendar, i);
+
+                Log.d(TAG, "nextDay : " + nextDay);
+
+                calendar.set(calendar.get(Calendar.YEAR),
+                        calendar.get(Calendar.MONTH),
+                        calendar.get(Calendar.DATE),
+                        hour,
+                        minute);
+
+                long targetMillis = calendar.getTimeInMillis() + DAY1MILLIS * nextDay;
+                long nowMillis = System.currentTimeMillis();
+
+                Log.d(TAG, " targetMillies : " + targetMillis + " nowMillis : " + nowMillis);
+
+                long delayMillis = targetMillis - nowMillis;
+
+                if (delayMillis < 0) {
+                    targetMillis += WEEK1MILLIS;
+                }
+
+                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, targetMillis, WEEK1MILLIS, pendingIntent);
+                Log.d(TAG, "Alarmregisted");
+            }
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.sungwoo.boostcamp.sungwooalarmapp;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
@@ -20,8 +22,6 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 public class AlarmListActivity extends AppCompatActivity {
-    @BindView(R.id.listRepoDebug)
-    TextView listRepoDebug;
     @BindView(R.id.alarmAddBtn)
     FloatingActionButton floatingActionButton;
     @BindView(R.id.alarmListRecyclerView)
@@ -61,6 +61,7 @@ public class AlarmListActivity extends AppCompatActivity {
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int index = (int)viewHolder.itemView.getTag();
                 Log.d("swipeDir", String.valueOf(swipeDir));
+                unregistWithAlarmManager(mRealmList.get(index).getDayOfWeekStr(), mRealmList.get(index).getId());
                 if(realm!=null) {
                     realm.beginTransaction();
                     AlarmRepo delAlarmRepo = realm.where(AlarmRepo.class).equalTo("id", mRealmList.get(index).getId()).findFirst();
@@ -87,22 +88,27 @@ public class AlarmListActivity extends AppCompatActivity {
         context.startActivity(intent);
     }
 
-    void debug(){
-        StringBuffer result = new StringBuffer();
-        List<AlarmRepo> realmList = realm.where(AlarmRepo.class).findAll();
-        for (AlarmRepo repo : realmList) {
-            result.append("hour : " + repo.getHour() + "\n");
-            result.append("minute : " + repo.getMinute() + "\n");
-            result.append("day : " + repo.getDayOfWeekStr() + "\n\n");
-        }
-        listRepoDebug.setText(result.toString());
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         if(realm!=null){
             realm.close();
+        }
+    }
+    void unregistWithAlarmManager(String dayOfWeekStr, int id) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, AlarmBroadcastReceiver.class);
+        intent.putExtra(getString(R.string.intent_isStart), true);
+
+        for (int i = 0; i < dayOfWeekStr.length(); i++) {
+            if (dayOfWeekStr.charAt(i) == 'O') {
+                int requestCode = id * 10 + i;
+                Log.d("multi", "adapter unregist pending requestCode : " + requestCode);
+
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                alarmManager.cancel(pendingIntent);
+            }
         }
     }
 }

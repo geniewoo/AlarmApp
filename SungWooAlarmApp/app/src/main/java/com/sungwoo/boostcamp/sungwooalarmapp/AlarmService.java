@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -15,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -40,24 +42,40 @@ public class AlarmService extends Service {
         Log.d(TAG, "service");
 
         if (!intent.getBooleanExtra(getString(R.string.intent_isStart), false)) {
-            mMediaPlayer.stop();
-            mMediaPlayer.reset();
+            if (mMediaPlayer != null) {
+                mMediaPlayer.stop();
+                mMediaPlayer.reset();
+            }
             stopForeground(true);
             stopSelf();
         } else {
             screenOn();
-
-            mMediaPlayer = MediaPlayer.create(this, R.raw.alarm1);
-            mMediaPlayer.start();
-
-            NotificationManager notificationmanager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
+                mMediaPlayer.stop();
+                mMediaPlayer.reset();
+                try {
+                    mMediaPlayer.setDataSource(this, Uri.parse("android.resource://com.sungwoo.boostcamp.sungwooalarmapp/" + R.raw.alarm1));
+                    mMediaPlayer.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mMediaPlayer.start();
+                Log.d("multi", "case1");
+            } else if (mMediaPlayer == null) {
+                mMediaPlayer = MediaPlayer.create(this, R.raw.alarm1);
+                mMediaPlayer.start();
+                Log.d("multi", "case2");
+            } else {
+                mMediaPlayer.start();
+                Log.d("multi", "case3");
+            }
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, AlarmIsRinging.class), PendingIntent.FLAG_UPDATE_CURRENT);
             if (Build.VERSION.SDK_INT > 15) {
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
                 builder.setSmallIcon(android.R.drawable.ic_lock_idle_alarm).setTicker("SungWooAlarm").setWhen(System.currentTimeMillis())
                         .setNumber(1)
                         .setContentTitle("알람")
-                        .setContentText("테스트")
+                        .setContentText("종료를 원하시면 클릭해 주세요")
                         .addAction(getStopNitifyAction())
                         .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
                         .setContentIntent(pendingIntent)
@@ -71,7 +89,7 @@ public class AlarmService extends Service {
 
                 try {
                     Method deprecatedMethod = notification.getClass().getMethod("setLatestEventInfo", Context.class, CharSequence.class, CharSequence.class, PendingIntent.class);
-                    deprecatedMethod.invoke(notification, "알람", "테스트", pendingIntent);
+                    deprecatedMethod.invoke(notification, "알람", "종료를 원하시면 클릭해 주세요", pendingIntent);
                 } catch (NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 }
                 //notificationmanager.notify(1, notification);
@@ -83,8 +101,8 @@ public class AlarmService extends Service {
         return START_NOT_STICKY;
     }
 
-    android.support.v4.app.NotificationCompat.Action getStopNitifyAction(){
-        Intent intent= new Intent(this, AlarmService.class);
+    android.support.v4.app.NotificationCompat.Action getStopNitifyAction() {
+        Intent intent = new Intent(this, AlarmService.class);
         intent.putExtra(getString(R.string.intent_isStart), false);
         PendingIntent incrementWaterPendingIntent = PendingIntent.getService(
                 this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -93,13 +111,14 @@ public class AlarmService extends Service {
                 incrementWaterPendingIntent);
         return alarmStopAction;
     }
+
     void screenOn() {
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         boolean isScreenOn;
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
             isScreenOn = pm.isInteractive();
-        } else{
+        } else {
             isScreenOn = pm.isScreenOn();
         }
 
