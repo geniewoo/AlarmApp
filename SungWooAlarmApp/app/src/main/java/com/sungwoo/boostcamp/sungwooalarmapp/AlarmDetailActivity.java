@@ -1,8 +1,5 @@
 package com.sungwoo.boostcamp.sungwooalarmapp;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -12,7 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -25,8 +22,6 @@ import butterknife.BindViews;
 import butterknife.ButterKnife;
 import io.realm.Realm;
 
-import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.DAY1MILLIS;
-import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.WEEK1MILLIS;
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUtil.registWithAlarmManager;
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUtil.unregistWithAlarmManager;
 
@@ -52,6 +47,8 @@ public class AlarmDetailActivity extends AppCompatActivity {
     protected TimePicker detailTimePicker;
     @BindViews({R.id.day_sun, R.id.day_mon, R.id.day_tue, R.id.day_wed, R.id.day_thu, R.id.day_fri, R.id.day_sat})
     protected List<TextView> day_TVs;
+    @BindView(R.id.detailRepeat_CB)
+    protected CheckBox detailRepeat_CB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -163,7 +160,7 @@ public class AlarmDetailActivity extends AppCompatActivity {
 
     private void detailConfirmTVClicked() {
         insertDataBase();
-        registWithAlarmManager(getApplicationContext(), dayOfWeekStr, mId, hour, minute);
+        registWithAlarmManager(getApplicationContext(), dayOfWeekStr, mId, hour, minute, detailMemo_ET.getText().toString(), detailRepeat_CB.isChecked());
         Toast.makeText(this, "알람 등록", Toast.LENGTH_SHORT).show();
         finish();
     }
@@ -187,7 +184,8 @@ public class AlarmDetailActivity extends AppCompatActivity {
     private AlarmRepo makeAlarmRepo() {
         int id = makeID();
         String memoStr = detailMemo_ET.getText().toString();
-        AlarmRepo alarmRepo = new AlarmRepo(id, hour, minute, dayOfWeekStr, true, memoStr);
+        boolean isRepeat = detailRepeat_CB.isChecked();
+        AlarmRepo alarmRepo = new AlarmRepo(id, hour, minute, dayOfWeekStr, true, memoStr, isRepeat);
         return alarmRepo;
     }
 
@@ -251,6 +249,7 @@ public class AlarmDetailActivity extends AppCompatActivity {
         mId = alarmRepo.getId();
         dayOfWeekStr = alarmRepo.getDayOfWeekStr();
         detailMemo_ET.setText(alarmRepo.getMemoStr());
+        detailRepeat_CB.setChecked(alarmRepo.isRepeat());
 
         for (int i = 0; i < day_TVs.size(); i++) {
             if (dayOfWeekStr.charAt(i) == 'O') {
@@ -269,11 +268,12 @@ public class AlarmDetailActivity extends AppCompatActivity {
                 alarmRepo.setActive(true);
                 alarmRepo.setDayOfWeekStr(dayOfWeekStr);
                 alarmRepo.setMemoStr(detailMemo_ET.getText().toString());
+                alarmRepo.setRepeat(detailRepeat_CB.isChecked());
                 realm.commitTransaction();
             }
         }
         unregistWithAlarmManager(getApplicationContext(), "OOOOOOO", mId);
-        registWithAlarmManager(getApplicationContext(), dayOfWeekStr, mId, hour, minute);
+        registWithAlarmManager(getApplicationContext(), dayOfWeekStr, mId, hour, minute, detailMemo_ET.getText().toString(), detailRepeat_CB.isChecked());
     }
 
     private int makeID() {

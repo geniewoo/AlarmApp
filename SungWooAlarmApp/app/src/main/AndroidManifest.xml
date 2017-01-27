@@ -28,17 +28,19 @@
             android:theme="@style/Theme.Design.Light.NoActionBar" />
 
         <receiver android:name=".AlarmBroadcastReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-            </intent-filter>
         </receiver>
         <service android:name=".AlarmService"/>
 
         <provider
             android:name=".AlarmProvider"
-            android:authorities="example.com.retrofittest"
+            android:authorities="com.sungwoo.boostcamp.sungwooalarmapp"
             android:exported="true"
             />
+        <receiver android:name=".AlarmBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
 
         <activity android:name=".AlarmIsRinging"></activity>
 

@@ -14,4 +14,12 @@
         android:textAlignment="center"
         android:text="@string/stop_playing"
         android:id="@+id/alarmRingingStop_TV"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="32dp"
+        android:textSize="24sp"
+        android:textColor="#000"
+        android:textAlignment="center"
+        android:id="@+id/alarmRingingMemo_TV"/>
 </LinearLayout>

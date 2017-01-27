@@ -25,11 +25,12 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        if(!intent.hasExtra(context.getString(R.string.intent_isStart))){
+        if(!intent.hasExtra(context.getString(R.string.intent_isStart)) && !intent.hasExtra(context.getString(R.string.intent_alarmMemo))){
             return;
         }
         Intent serviceIntent = new Intent(context,AlarmService.class);
         serviceIntent.putExtra(context.getString(R.string.intent_isStart), intent.getBooleanExtra(context.getString(R.string.intent_isStart), false));
+        serviceIntent.putExtra(context.getString(R.string.intent_alarmMemo), intent.getStringExtra(context.getString(R.string.intent_alarmMemo)));
         Log.d(TAG, "BroadcastReceiver");
         context.startService(serviceIntent);
         /*

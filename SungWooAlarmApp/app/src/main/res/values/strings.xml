@@ -22,6 +22,7 @@
     <string name="intent_isCreate">ISCREATE</string>
     <string name="intent_alarmIndex">ALARMINDEX</string>
     <string name="intent_isStart">ALARMSTART</string>
+    <string name="intent_alarmMemo">ALARMMEMO</string>
     <string name="intent_id">INTENTID</string>
     <string name="expected_error">오류</string>
 

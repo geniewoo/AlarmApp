@@ -8,6 +8,9 @@ import android.util.Log;
 
 import java.util.Calendar;
 
+import io.realm.Realm;
+import io.realm.RealmResults;
+
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmDetailActivity.getNextDay;
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.DAY1MILLIS;
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.WEEK1MILLIS;
@@ -19,14 +22,15 @@ import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.WEEK1MILLIS;
 public class AlarmUtil {
     private static  final String TAG = AlarmUtil.class.toString();
 
-    public static void registWithAlarmManager(Context context, String dayOfWeekStr, int mId, int hour, int minute) {
+    public static void registWithAlarmManager(Context context, String dayOfWeekStr, int id, int hour, int minute, String memoStr, boolean isRepeat) {
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmBroadcastReceiver.class);
         intent.putExtra(context.getString(R.string.intent_isStart), true);
+        intent.putExtra(context.getString(R.string.intent_alarmMemo), memoStr);
         Log.d(TAG, "Week1Millis : " + WEEK1MILLIS + " Day1MIillis : " + DAY1MILLIS);
         for (int i = 0; i < dayOfWeekStr.length(); i++) {
             if (dayOfWeekStr.charAt(i) == 'O') {
-                int requestCode = mId * 10 + i;
+                int requestCode = id * 10 + i;
                 Log.d("multi", "adapter regist pending requestCode : " + requestCode);
 
                 PendingIntent pendingIntent = PendingIntent.getBroadcast(context, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -53,8 +57,11 @@ public class AlarmUtil {
                 if (delayMillis < 0) {
                     targetMillis += WEEK1MILLIS;
                 }
-
-                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, targetMillis, WEEK1MILLIS, pendingIntent);
+                if(isRepeat) {
+                    alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, targetMillis, WEEK1MILLIS, pendingIntent);
+                }else{
+                    alarmManager.set(AlarmManager.RTC_WAKEUP, targetMillis, pendingIntent);
+                }
                 Log.d(TAG, "Alarmregisted");
             }
         }
@@ -74,5 +81,17 @@ public class AlarmUtil {
                 alarmManager.cancel(pendingIntent);
             }
         }
+    }
+    public static void registAllWithAlarmManager(Context context){
+        Log.d("BootReceiver", "registall");
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<AlarmRepo> results = realm.where(AlarmRepo.class).findAll();
+        for(AlarmRepo alarmRepo : results){
+            Log.d("BootReceiver", "regis~~");
+            if(alarmRepo.isActive()) {
+                registWithAlarmManager(context, alarmRepo.getDayOfWeekStr(), alarmRepo.getId(), alarmRepo.getHour(), alarmRepo.getMinute(), alarmRepo.getMemoStr(), alarmRepo.isRepeat());
+            }
+        }
+        realm.close();
     }
 }

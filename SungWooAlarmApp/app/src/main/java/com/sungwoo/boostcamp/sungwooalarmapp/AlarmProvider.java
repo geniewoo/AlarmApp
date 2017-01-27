@@ -79,11 +79,12 @@ public class AlarmProvider extends ContentProvider {
                 alarmRepo.setDayOfWeekStr(contentValues.getAsString(columns[3]));
                 alarmRepo.setActive(contentValues.getAsBoolean(columns[4]));
                 alarmRepo.setMemoStr(contentValues.getAsString(columns[5]));
+                alarmRepo.setRepeat(contentValues.getAsBoolean(columns[6]));
                 realm.commitTransaction();
                 realm.close();
 
                 if(contentValues.getAsBoolean(columns[4])){
-                    AlarmUtil.registWithAlarmManager(getContext(), contentValues.getAsString(columns[3]), contentValues.getAsInteger(columns[0]), contentValues.getAsInteger(columns[1]), contentValues.getAsInteger(columns[2]));
+                    AlarmUtil.registWithAlarmManager(getContext(), contentValues.getAsString(columns[3]), contentValues.getAsInteger(columns[0]), contentValues.getAsInteger(columns[1]), contentValues.getAsInteger(columns[2]), contentValues.getAsString(columns[5]), contentValues.getAsBoolean(columns[6]));
                 }
 
                 return Uri.withAppendedPath(uri, String.valueOf(alarmRepo.getId()));
@@ -136,9 +137,10 @@ public class AlarmProvider extends ContentProvider {
                 updateAlarmRepo.setDayOfWeekStr(contentValues.getAsString(columns[3]));
                 updateAlarmRepo.setActive(contentValues.getAsBoolean(columns[4]));
                 updateAlarmRepo.setMemoStr(contentValues.getAsString(columns[5]));
+                updateAlarmRepo.setRepeat(contentValues.getAsBoolean(columns[6]));
                 realm.commitTransaction();
                 realm.close();
-                AlarmUtil.registWithAlarmManager(getContext(), contentValues.getAsString(columns[3]), contentValues.getAsInteger(columns[0]), contentValues.getAsInteger(columns[1]), contentValues.getAsInteger(columns[2]));
+                AlarmUtil.registWithAlarmManager(getContext(), contentValues.getAsString(columns[3]), contentValues.getAsInteger(columns[0]), contentValues.getAsInteger(columns[1]), contentValues.getAsInteger(columns[2]), contentValues.getAsString(columns[5]),contentValues.getAsBoolean(columns[6]));
                 break;
             default:
                 return -1;

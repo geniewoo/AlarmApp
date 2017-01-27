@@ -122,7 +122,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
                 alarmRepos.get(index).setActive(true);
                 realm.commitTransaction();
                 Toast.makeText(mContext, mContext.getString(R.string.alarm_active), Toast.LENGTH_SHORT).show();
-                registWithAlarmManager(mContext, alarmRepos.get(index).getDayOfWeekStr(), alarmRepos.get(index).getId(), alarmRepos.get(index).getHour(), alarmRepos.get(index).getMinute());
+                registWithAlarmManager(mContext, alarmRepos.get(index).getDayOfWeekStr(), alarmRepos.get(index).getId(), alarmRepos.get(index).getHour(), alarmRepos.get(index).getMinute(), alarmRepos.get(index).getMemoStr(), alarmRepos.get(index).isRepeat());
             }
         }
     }

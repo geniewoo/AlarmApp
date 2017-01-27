@@ -13,6 +13,8 @@ import butterknife.ButterKnife;
 public class AlarmIsRinging extends AppCompatActivity {
     @BindView(R.id.alarmRingingStop_TV)
     TextView alarmRingingStop_TV;
+    @BindView(R.id.alarmRingingMemo_TV)
+    TextView alarmRingingMemo_TV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +34,8 @@ public class AlarmIsRinging extends AppCompatActivity {
                 finish();
             }
         });
+        Intent intent = getIntent();
+        alarmRingingMemo_TV.setText(intent.getStringExtra(getString(R.string.intent_alarmMemo)));
     }
 
     void stopMusic(){

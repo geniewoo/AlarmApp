@@ -14,18 +14,20 @@ public class AlarmRepo extends RealmObject {
     private String dayOfWeekStr;
     private boolean isActive;
     private String memoStr;
+    private boolean isRepeat;
 
 
     public AlarmRepo() {
     }
 
-    public AlarmRepo(int id, int hour, int minute, String dayOfWeekStr, boolean isActive, String memoStr) {
+    public AlarmRepo(int id, int hour, int minute, String dayOfWeekStr, boolean isActive, String memoStr, boolean isRepeat) {
         this.id = id;
         this.hour = hour;
         this.minute = minute;
         this.dayOfWeekStr = dayOfWeekStr;
         this.isActive = isActive;
         this.memoStr = memoStr;
+        this.isRepeat = isRepeat;
     }
 
     public int getHour() {
@@ -74,5 +76,13 @@ public class AlarmRepo extends RealmObject {
 
     public void setMemoStr(String memoStr) {
         this.memoStr = memoStr;
+    }
+
+    public boolean isRepeat() {
+        return isRepeat;
+    }
+
+    public void setRepeat(boolean repeat) {
+        isRepeat = repeat;
     }
 }
