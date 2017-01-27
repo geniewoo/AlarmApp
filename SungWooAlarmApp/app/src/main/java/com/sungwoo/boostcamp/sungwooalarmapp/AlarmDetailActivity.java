@@ -27,29 +27,31 @@ import io.realm.Realm;
 
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.DAY1MILLIS;
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.WEEK1MILLIS;
+import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUtil.registWithAlarmManager;
+import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUtil.unregistWithAlarmManager;
 
 public class AlarmDetailActivity extends AppCompatActivity {
-    final static String TAG = AlarmDetailActivity.class.toString();
-    int mId;
-    int hour;
-    int minute;
-    String dayOfWeekStr = "XXXXXXX";
-    List<AlarmRepo> mAlarmRepos = null;
+    private final static String TAG = AlarmDetailActivity.class.toString();
+    private int mId;
+    private int hour;
+    private int minute;
+    private String dayOfWeekStr = "XXXXXXX";
+    private List<AlarmRepo> mAlarmRepos = null;
 
-    Realm realm;
+    private Realm realm;
 
-    boolean isCreate;
+    private boolean isCreate;
 
     @BindView(R.id.detailMemo_ET)
-    TextView detailMemo_ET;
+    protected TextView detailMemo_ET;
     @BindView(R.id.detailTBLeft_TV)
-    TextView detailTBLeft_TV;
+    protected TextView detailTBLeft_TV;
     @BindView(R.id.detailTBRight_TV)
-    TextView detailTBRight_TV;
+    protected TextView detailTBRight_TV;
     @BindView(R.id.timePicker)
-    TimePicker detailTimePicker;
+    protected TimePicker detailTimePicker;
     @BindViews({R.id.day_sun, R.id.day_mon, R.id.day_tue, R.id.day_wed, R.id.day_thu, R.id.day_fri, R.id.day_sat})
-    List<TextView> day_TVs;
+    protected List<TextView> day_TVs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,24 +151,24 @@ public class AlarmDetailActivity extends AppCompatActivity {
 
     }
 
-    void whenTimeChanged(int h, int m) {
+    private void whenTimeChanged(int h, int m) {
         Log.d(TAG, "h : " + String.valueOf(h));
         hour = h;
         minute = m;
     }
 
-    void detailCancelClicked() {
+    private void detailCancelClicked() {
         finish();
     }
 
-    void detailConfirmTVClicked() {
+    private void detailConfirmTVClicked() {
         insertDataBase();
-        registWithAlarmManager();
+        registWithAlarmManager(getApplicationContext(), dayOfWeekStr, mId, hour, minute);
         Toast.makeText(this, "알람 등록", Toast.LENGTH_SHORT).show();
         finish();
     }
 
-    void insertDataBase() {
+    private void insertDataBase() {
         AlarmRepo alarmRepo = makeAlarmRepo();
 
         realm.beginTransaction();
@@ -182,14 +184,14 @@ public class AlarmDetailActivity extends AppCompatActivity {
         }
     }
 
-    AlarmRepo makeAlarmRepo() {
+    private AlarmRepo makeAlarmRepo() {
         int id = makeID();
         String memoStr = detailMemo_ET.getText().toString();
         AlarmRepo alarmRepo = new AlarmRepo(id, hour, minute, dayOfWeekStr, true, memoStr);
         return alarmRepo;
     }
 
-    void initSettings() {
+    private void initSettings() {
         if (Build.VERSION.SDK_INT >= 23) {
             hour = detailTimePicker.getHour();
             minute = detailTimePicker.getMinute();
@@ -231,7 +233,7 @@ public class AlarmDetailActivity extends AppCompatActivity {
         }
     }
 
-    void changeDayColor(int index, boolean isActive) {
+    private void changeDayColor(int index, boolean isActive) {
         if (isActive) {
             day_TVs.get(index).setBackgroundColor(Color.MAGENTA);
         } else {
@@ -239,7 +241,7 @@ public class AlarmDetailActivity extends AppCompatActivity {
         }
     }
 
-    void changeSetting(AlarmRepo alarmRepo) {
+    private void changeSetting(AlarmRepo alarmRepo) {
         Log.d("changeSetting", "changeSetting");
         if (Build.VERSION.SDK_INT >= 23) {
             Log.d("changeSetting", "changeSetting1");
@@ -257,7 +259,7 @@ public class AlarmDetailActivity extends AppCompatActivity {
         }
     }
 
-    void detailChangeTVClicked(int index) {
+    private void detailChangeTVClicked(int index) {
         if (mAlarmRepos != null) {
             AlarmRepo alarmRepo = mAlarmRepos.get(index);
             if (realm != null) {
@@ -270,11 +272,11 @@ public class AlarmDetailActivity extends AppCompatActivity {
                 realm.commitTransaction();
             }
         }
-        unregistWithAlarmManager("OOOOOOO", mId);
-        registWithAlarmManager();
+        unregistWithAlarmManager(getApplicationContext(), "OOOOOOO", mId);
+        registWithAlarmManager(getApplicationContext(), dayOfWeekStr, mId, hour, minute);
     }
 
-    int makeID() {
+    private int makeID() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         int new_ID = sharedPreferences.getInt(getString(R.string.pref_ID), 0);
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -285,7 +287,7 @@ public class AlarmDetailActivity extends AppCompatActivity {
         return new_ID;
     }
 
-    void registWithAlarmManager() {
+    /*private void registWithAlarmManager() {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmBroadcastReceiver.class);
         intent.putExtra(getString(R.string.intent_isStart), true);
@@ -325,7 +327,7 @@ public class AlarmDetailActivity extends AppCompatActivity {
                 Log.d(TAG, "Alarmregisted");
             }
         }
-    }
+    }*/
 
     public static int getNextDay(Calendar calendar, int targetDayOfWeek) {
         int dayOfWeekInt;
@@ -357,7 +359,7 @@ public class AlarmDetailActivity extends AppCompatActivity {
         Log.d(TAG, "dayOfWeekInt : " + dayOfWeekInt);
         return targetDayOfWeek - dayOfWeekInt;
     }
-    void unregistWithAlarmManager(String dayOfWeekStr, int id) {
+    /*private void unregistWithAlarmManager(String dayOfWeekStr, int id) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmBroadcastReceiver.class);
         intent.putExtra(getString(R.string.intent_isStart), true);
@@ -373,5 +375,5 @@ public class AlarmDetailActivity extends AppCompatActivity {
                 Log.d(TAG, "AlarmUnregisted");
             }
         }
-    }
+    }*/
 }

@@ -26,9 +26,9 @@ import java.lang.reflect.Method;
 
 public class AlarmService extends Service {
 
-    static final String TAG = AlarmService.class.toString();
+    private static final String TAG = AlarmService.class.toString();
 
-    MediaPlayer mMediaPlayer;
+    private MediaPlayer mMediaPlayer;
 
     @Nullable
     @Override
@@ -76,7 +76,7 @@ public class AlarmService extends Service {
                         .setNumber(1)
                         .setContentTitle("알람")
                         .setContentText("종료를 원하시면 클릭해 주세요")
-                        .addAction(getStopNitifyAction())
+                        .addAction(getStopNotifyAction())
                         .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
                         .setContentIntent(pendingIntent)
                         .setAutoCancel(true).setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
@@ -101,7 +101,7 @@ public class AlarmService extends Service {
         return START_NOT_STICKY;
     }
 
-    android.support.v4.app.NotificationCompat.Action getStopNitifyAction() {
+    private android.support.v4.app.NotificationCompat.Action getStopNotifyAction() {
         Intent intent = new Intent(this, AlarmService.class);
         intent.putExtra(getString(R.string.intent_isStart), false);
         PendingIntent incrementWaterPendingIntent = PendingIntent.getService(
@@ -112,7 +112,7 @@ public class AlarmService extends Service {
         return alarmStopAction;
     }
 
-    void screenOn() {
+    private void screenOn() {
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         boolean isScreenOn;
 

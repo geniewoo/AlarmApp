@@ -34,7 +34,14 @@
         </receiver>
         <service android:name=".AlarmService"/>
 
+        <provider
+            android:name=".AlarmProvider"
+            android:authorities="example.com.retrofittest"
+            android:exported="true"
+            />
+
         <activity android:name=".AlarmIsRinging"></activity>
+
     </application>
 
 </manifest>

@@ -21,7 +21,7 @@ import java.lang.reflect.Method;
 
 public class AlarmBroadcastReceiver extends BroadcastReceiver {
     //MediaPlayer mMediaPlayer;
-    static final String TAG = AlarmBroadcastReceiver.class.toString();
+    private static final String TAG = AlarmBroadcastReceiver.class.toString();
     @Override
     public void onReceive(Context context, Intent intent) {
 

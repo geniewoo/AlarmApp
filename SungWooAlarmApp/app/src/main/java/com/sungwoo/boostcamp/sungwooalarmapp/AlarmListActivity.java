@@ -21,14 +21,16 @@ import butterknife.ButterKnife;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
+import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUtil.unregistWithAlarmManager;
+
 public class AlarmListActivity extends AppCompatActivity {
     @BindView(R.id.alarmAddBtn)
-    FloatingActionButton floatingActionButton;
+    protected FloatingActionButton floatingActionButton;
     @BindView(R.id.alarmListRecyclerView)
-    RecyclerView alarmListRV;
-    Realm realm;
-    RecyclerView.Adapter mAdapter;
-    List<AlarmRepo> mRealmList;
+    protected RecyclerView alarmListRV;
+    private Realm realm;
+    private RecyclerView.Adapter mAdapter;
+    private List<AlarmRepo> mRealmList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,7 +63,8 @@ public class AlarmListActivity extends AppCompatActivity {
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int index = (int)viewHolder.itemView.getTag();
                 Log.d("swipeDir", String.valueOf(swipeDir));
-                unregistWithAlarmManager(mRealmList.get(index).getDayOfWeekStr(), mRealmList.get(index).getId());
+
+                unregistWithAlarmManager(getApplicationContext(), mRealmList.get(index).getDayOfWeekStr(), mRealmList.get(index).getId());
                 if(realm!=null) {
                     realm.beginTransaction();
                     AlarmRepo delAlarmRepo = realm.where(AlarmRepo.class).equalTo("id", mRealmList.get(index).getId()).findFirst();
@@ -95,7 +98,7 @@ public class AlarmListActivity extends AppCompatActivity {
             realm.close();
         }
     }
-    void unregistWithAlarmManager(String dayOfWeekStr, int id) {
+    /*public void unregistWithAlarmManager(String dayOfWeekStr, int id) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(this, AlarmBroadcastReceiver.class);
         intent.putExtra(getString(R.string.intent_isStart), true);
@@ -110,5 +113,6 @@ public class AlarmListActivity extends AppCompatActivity {
                 alarmManager.cancel(pendingIntent);
             }
         }
-    }
+    }*/
+
 }

@@ -23,17 +23,19 @@ import io.realm.Realm;
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmDetailActivity.getNextDay;
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.DAY1MILLIS;
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.WEEK1MILLIS;
+import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUtil.registWithAlarmManager;
+import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUtil.unregistWithAlarmManager;
 
 /**
  * Created by psw10 on 2017-01-24.
  */
 
 public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.AlarmListViewHolder> {
-    final String TAG = AlarmListActivity.class.toString();
-    List<AlarmRepo> alarmRepos;
-    Context mContext;
-    Realm realm;
-    static final int LIST_INDEX = 100;
+    private final String TAG = AlarmListActivity.class.toString();
+    private List<AlarmRepo> alarmRepos;
+    private Context mContext;
+    private Realm realm;
+    private static final int LIST_INDEX = 100;
 
 
 
@@ -111,7 +113,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
                 alarmRepos.get(index).setActive(false);
                 realm.commitTransaction();
                 Toast.makeText(mContext, mContext.getString(R.string.alarm_inactive), Toast.LENGTH_SHORT).show();
-                unregistWithAlarmManager(alarmRepos.get(index).getDayOfWeekStr(), alarmRepos.get(index).getId());
+                unregistWithAlarmManager(mContext, alarmRepos.get(index).getDayOfWeekStr(), alarmRepos.get(index).getId());
             }
         }else {
             imageView.setImageResource(android.R.drawable.presence_away);
@@ -120,7 +122,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
                 alarmRepos.get(index).setActive(true);
                 realm.commitTransaction();
                 Toast.makeText(mContext, mContext.getString(R.string.alarm_active), Toast.LENGTH_SHORT).show();
-                registWithAlarmManager(alarmRepos.get(index).getDayOfWeekStr(), alarmRepos.get(index).getId(), alarmRepos.get(index).getHour(), alarmRepos.get(index).getMinute());
+                registWithAlarmManager(mContext, alarmRepos.get(index).getDayOfWeekStr(), alarmRepos.get(index).getId(), alarmRepos.get(index).getHour(), alarmRepos.get(index).getMinute());
             }
         }
     }
@@ -146,7 +148,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
         }
     }
 
-    void unregistWithAlarmManager(String dayOfWeekStr, int id) {
+   /* public void unregistWithAlarmManager(String dayOfWeekStr, int id) {
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(mContext, AlarmBroadcastReceiver.class);
         intent.putExtra(mContext.getString(R.string.intent_isStart), true);
@@ -162,9 +164,9 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
                 Log.d(TAG, "AlarmUnregisted");
             }
         }
-    }
+    }*/
 
-    void registWithAlarmManager(String dayOfWeekStr, int mId, int hour, int minute) {
+   /* public void registWithAlarmManager(String dayOfWeekStr, int mId, int hour, int minute) {
         AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(mContext, AlarmBroadcastReceiver.class);
         intent.putExtra(mContext.getString(R.string.intent_isStart), true);
@@ -203,5 +205,5 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
                 Log.d(TAG, "Alarmregisted");
             }
         }
-    }
+    }*/
 }
