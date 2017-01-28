@@ -31,6 +31,13 @@ public class AlarmBroadcastReceiver extends BroadcastReceiver {
         Intent serviceIntent = new Intent(context,AlarmService.class);
         serviceIntent.putExtra(context.getString(R.string.intent_isStart), intent.getBooleanExtra(context.getString(R.string.intent_isStart), false));
         serviceIntent.putExtra(context.getString(R.string.intent_alarmMemo), intent.getStringExtra(context.getString(R.string.intent_alarmMemo)));
+        if(!intent.getBooleanExtra(context.getString(R.string.intent_alarmRepeat), true)){
+            serviceIntent.putExtra(context.getString(R.string.intent_alarmRepeat), false);
+            int tempId = intent.getIntExtra(context.getString(R.string.intent_alarmId), -1);
+            serviceIntent.putExtra(context.getString(R.string.intent_alarmId), tempId);
+            int tempDayOfWeek = intent.getIntExtra(context.getString(R.string.intent_dayOfWeek), -1);
+            serviceIntent.putExtra(context.getString(R.string.intent_dayOfWeek), tempDayOfWeek);
+        }
         Log.d(TAG, "BroadcastReceiver");
         context.startService(serviceIntent);
         /*

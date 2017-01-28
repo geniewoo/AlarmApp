@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUtil.remove_A_DayOfWeekFromAlarmRepo;
+
 /**
  * Created by psw10 on 2017-01-25.
  */
@@ -32,6 +34,7 @@ public class AlarmService extends Service {
 
     private MediaPlayer mMediaPlayer;
     private Vibrator mVibrator;
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -79,16 +82,22 @@ public class AlarmService extends Service {
                 mMediaPlayer.start();
                 Log.d("multi", "case3");
             }
-            if(mVibrator == null) {
+            if (mVibrator == null) {
                 mVibrator = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
             }
-            if(mVibrator.hasVibrator()){
+            if (mVibrator.hasVibrator()) {
                 mVibrator.cancel();
                 mVibrator.vibrate(PATTERN, -1);
             }
 
             Intent ringingIntent = new Intent(this, AlarmIsRinging.class);
             ringingIntent.putExtra(getString(R.string.intent_alarmMemo), memoStr);
+            if (!intent.getBooleanExtra(getString(R.string.intent_alarmRepeat), true)) {
+                int tempId = intent.getIntExtra(getString(R.string.intent_alarmId), -1);
+                int tempDayOfWeek = intent.getIntExtra(getString(R.string.intent_dayOfWeek), -1);
+                remove_A_DayOfWeekFromAlarmRepo(tempId, tempDayOfWeek);
+            }
+
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, ringingIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             if (Build.VERSION.SDK_INT > 15) {

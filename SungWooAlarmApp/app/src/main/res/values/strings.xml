@@ -24,6 +24,9 @@
     <string name="intent_isStart">ALARMSTART</string>
     <string name="intent_alarmMemo">ALARMMEMO</string>
     <string name="intent_id">INTENTID</string>
+    <string name="intent_alarmId">ALARMID</string>
+    <string name="intent_alarmRepeat">ALARMREPEAT</string>
+    <string name="intent_dayOfWeek">ALARMDAYOFWEEK</string>
     <string name="expected_error">오류</string>
 
     <string name="pref_ID">PREFID</string>
