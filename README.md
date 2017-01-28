@@ -1,6 +1,7 @@
 ## BoostCamp 4주차과제
 #### 17/1/23
 ##### done
+
 - ButterKnife이용, Realm이용,
 - Realm insert 및 findAll 사용,
 - AlarmDetailActivity activity 생성
@@ -8,6 +9,7 @@
 - RecyclerView구현했으나 디자인 매우이상함
 
 ##### todo
+
 - 기존 데이터 클릭시 수정화면으로 진입.(AlarmDetailActivity수정해서 사용)
 - RecyclerView item에서 시계모양 클릭시 데이터베이스 조정하기
 - 알람 생성시 AlarmManager 등록하기
@@ -16,15 +18,18 @@
 - RecyclerView item에서 시계모양 클릭시 AlarmManager 조정하기
 
 ##### fixlist
+
 - 요일 선택 잘못만듬 수정해야함
 - RecyclerViewItem 디자인수정해야함
 
 #### 17/1/24
+
 - 하루종일 일있어서 제대로 못함ㅜㅜ
 
 #### 17/1/25
 
 ##### done
+
 - ButterKnife이용, Realm이용,
 - Realm insert 및 findAll 사용,
 - AlarmDetailActivity activity 생성
@@ -49,8 +54,8 @@
 
 #### 17/1/26
 
-
 ##### done
+
 - ButterKnife이용, Realm이용,
 - Realm insert 및 findAll 사용,
 - AlarmDetailActivity activity 생성
@@ -76,16 +81,19 @@
 - 알람 재거시 등록취소 확인하기
 
 ##### todo
+
 - __ 음악이 꺼져있으면 진동울리는 방법 구상 __
 - ContentProvider 생성
 - 재부팅시 재등록 로직 만들기
 - 알람 울릴시 위치 or 날시정보가져오게 만들기
 - '반복' '만들기
 - 저장한 메모 가져오기
+
 ##### fixlist
 
 #### 17/1/27
 ##### done
+
 - ButterKnife이용, Realm이용,
 - Realm insert 및 findAll 사용,
 - AlarmDetailActivity activity 생성
@@ -116,7 +124,9 @@
 - 재부팅시 재등록 로직 만들기
 - 진동구현
 - 알람 소리 적용
+
 ##### todo
+
 - 알람 울릴시 위치 or 날시정보가져오게 만들기
 - provider 확인
 - 알람 울리고 나면 반복 설정 안해 둔 경우 알람 끄기<- 아니면 재부팅 할 때마다 다시됨.
@@ -180,6 +190,7 @@
 #### 2. AlarmManager로 BroadCast를 보내고 다시 Service를 실행하여 알람 시작
 - service는 ForegroundService 사용
 #### 3. 알람 요일 다수 선택 가능 및 반복 선택 가능
+- 원하는 요일들과 반복 여부 선택 가능
 #### 4. 바로 끌 수 있는 Action을 가진 Notificaion 제공, Notification을 누를 시 날씨정보를 볼 수 있는 Activity 제공
 #### 5. 알람 동작시 진동, 소리 제공
 - 진동은 에뮬레이터의 한계로 코딩은 했으나 테스트 불가
@@ -199,3 +210,4 @@
 #### 1. 리스트에서 시계이미지 누르면 활성, 비활성화 가능
 ### 한계
 - 한번만 울리는 알람의 경우 디바이스가 꺼져있는 상황에서 알람시간이 될 경우 비활성화 되지않고 여전히 활성화, 디바이스가 켜져있을 알람이 울려야지 취소되게 만들었음.
+- 설연휴라 휴대폰으로 테스트 할 수 있는 환경이 되지않아 에뮬레이터만으로 테스트 할 수 없는 경우가 있어 아쉬움.
