@@ -1,5 +1,7 @@
 ## BoostCamp 4주차과제
+
 #### 17/1/23
+
 ##### done
 
 - ButterKnife이용, Realm이용,
@@ -92,6 +94,7 @@
 ##### fixlist
 
 #### 17/1/27
+
 ##### done
 
 - ButterKnife이용, Realm이용,
@@ -134,6 +137,7 @@
 #### 17/1/28
 
 ##### done
+
 - ButterKnife이용, Realm이용,
 - Realm insert 및 findAll 사용,
 - AlarmDetailActivity activity 생성
@@ -168,8 +172,11 @@
 - provider 확인 <query만>;
 - 알람 울리고 나면 반복 설정 안해 둔 경우 알람 끄기<- 아니면 재부팅 할 때마다 다시됨. 모든요일 다 꺼지면 비활성화
 - clean code
+
 ##### todo
+
 #### issue
+
 - ListActivity에서 onCreate, swipe일 때만 changeNotify하는게 맞는가
 - 왜 swipe하면 순서가 달라지는가?
 
