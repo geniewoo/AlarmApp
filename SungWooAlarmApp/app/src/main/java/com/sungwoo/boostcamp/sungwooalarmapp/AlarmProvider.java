@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import java.util.List;
 
@@ -17,7 +16,7 @@ import io.realm.RealmQuery;
 /**
  * Created by psw10 on 2017-01-27.
  */
-
+//다른앱에 데이터베이스를 제공하기 위한 클래스이다
 public class AlarmProvider extends ContentProvider {
     private Realm realm;
     RealmQuery<AlarmRepo> query;
@@ -41,11 +40,9 @@ public class AlarmProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] strings, String s, String[] strings1, String s1) {
         int matchID = sUriMatcher.match(uri);
-        Log.d("Provider", "query " + String.valueOf(matchID));
         MatrixCursor cursor;
         switch (sUriMatcher.match(uri)) {
             case ALARM_FINDALL:
-                Log.d("Provider", "query1");
                 realm = Realm.getDefaultInstance();
                 query = realm.where(AlarmRepo.class);
                 mAlarmRepos = query.findAll();
@@ -57,7 +54,6 @@ public class AlarmProvider extends ContentProvider {
                 realm.close();
                 break;
             default:
-                Log.d("Provider", "query2, " + uri.toString());
                 return null;
         }
         return cursor;

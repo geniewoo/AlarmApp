@@ -25,8 +25,8 @@ import io.realm.Realm;
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUtil.registWithAlarmManager;
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUtil.unregistWithAlarmManager;
 
+// 알람 사세 설정 페이지이다.
 public class AlarmDetailActivity extends AppCompatActivity {
-    private final static String TAG = AlarmDetailActivity.class.toString();
     private int mId;
     private int hour;
     private int minute;
@@ -58,12 +58,10 @@ public class AlarmDetailActivity extends AppCompatActivity {
         realm = Realm.getDefaultInstance();
 
         ButterKnife.bind(this);
-        Log.d(TAG, "setOnTimeChangedListener");
         detailTimePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
             @Override
             public void onTimeChanged(TimePicker timePicker, int i, int i1) {
                 whenTimeChanged(i, i1);
-                Log.d(TAG, "onTimeChangedListener");
             }
         });
         for (int i = 0; i < day_TVs.size(); i++) {
@@ -120,11 +118,10 @@ public class AlarmDetailActivity extends AppCompatActivity {
                     final int index = intent.getIntExtra(getString(R.string.intent_alarmIndex), -1);
                     if (index != -1) {
                         mAlarmRepos = realm.where(AlarmRepo.class).findAll();
-                        Log.d("alarmDetailActivity", "index : " + index + " num : " + mAlarmRepos.size());
                         AlarmRepo alarmRepo = mAlarmRepos.get(index);
                         changeSetting(alarmRepo);
                     } else {
-                        Toast.makeText(this, "error!!!!", Toast.LENGTH_SHORT).show();
+                        Log.d("수정페이지", "일어나면 안되는 에러");
                     }
                     detailTBLeft_TV.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -149,7 +146,6 @@ public class AlarmDetailActivity extends AppCompatActivity {
     }
 
     private void whenTimeChanged(int h, int m) {
-        Log.d(TAG, "h : " + String.valueOf(h));
         hour = h;
         minute = m;
     }
@@ -240,9 +236,7 @@ public class AlarmDetailActivity extends AppCompatActivity {
     }
 
     private void changeSetting(AlarmRepo alarmRepo) {
-        Log.d("changeSetting", "changeSetting");
         if (Build.VERSION.SDK_INT >= 23) {
-            Log.d("changeSetting", "changeSetting1");
             detailTimePicker.setHour(alarmRepo.getHour());
             detailTimePicker.setMinute(alarmRepo.getMinute());
         }
@@ -282,52 +276,9 @@ public class AlarmDetailActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         mId = ++new_ID;
         editor.putInt(getString(R.string.pref_ID), new_ID);
-        Log.d("new_ID", String.valueOf(new_ID));
         editor.commit();
         return new_ID;
     }
-
-    /*private void registWithAlarmManager() {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AlarmBroadcastReceiver.class);
-        intent.putExtra(getString(R.string.intent_isStart), true);
-
-        Log.d(TAG, "Week1Millis : " + WEEK1MILLIS + " Day1MIillis : " + DAY1MILLIS);
-        for (int i = 0; i < dayOfWeekStr.length(); i++) {
-            if (dayOfWeekStr.charAt(i) == 'O') {
-                int requestCode = mId * 10 + i;
-
-                Log.d("multi", "regist pending requestCode : " + requestCode);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                Calendar calendar = Calendar.getInstance();
-
-                int nextDay = getNextDay(calendar, i);
-
-                Log.d(TAG, "nextDay : " + nextDay);
-
-                calendar.set(calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH),
-                        calendar.get(Calendar.DATE),
-                        hour,
-                        minute);
-
-                long targetMillis = calendar.getTimeInMillis() + DAY1MILLIS * nextDay;
-                long nowMillis = System.currentTimeMillis();
-
-                Log.d(TAG, " targetMillies : " + targetMillis + " nowMillis : " + nowMillis);
-
-                long delayMillis = targetMillis - nowMillis;
-
-                if (delayMillis < 0) {
-                    targetMillis += WEEK1MILLIS;
-                }
-
-                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, targetMillis, WEEK1MILLIS, pendingIntent);
-                Log.d(TAG, "Alarmregisted");
-            }
-        }
-    }*/
 
     public static int getNextDay(Calendar calendar, int targetDayOfWeek) {
         int dayOfWeekInt;
@@ -356,24 +307,6 @@ public class AlarmDetailActivity extends AppCompatActivity {
             default:
                 dayOfWeekInt = -1;
         }
-        Log.d(TAG, "dayOfWeekInt : " + dayOfWeekInt);
         return targetDayOfWeek - dayOfWeekInt;
     }
-    /*private void unregistWithAlarmManager(String dayOfWeekStr, int id) {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AlarmBroadcastReceiver.class);
-        intent.putExtra(getString(R.string.intent_isStart), true);
-
-        for (int i = 0; i < dayOfWeekStr.length(); i++) {
-            if (dayOfWeekStr.charAt(i) == 'O') {
-                int requestCode = id * 10 + i;
-                Log.d("multi", "adapter unregist pending requestCode : " + requestCode);
-
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                alarmManager.cancel(pendingIntent);
-                Log.d(TAG, "AlarmUnregisted");
-            }
-        }
-    }*/
 }

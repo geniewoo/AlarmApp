@@ -8,9 +8,9 @@ import java.util.List;
 /**
  * Created by psw10 on 2017-01-28.
  */
-
+// 날씨정보를 Gson형식으로 가져오기위한 변수클래스
 public class WeatherGson {
-    @SerializedName("result")
+    @SerializedName("result")// SerializedName을 쓸 경우 변수이름과 JSON Key 가 달라도 된다.
     private Result result;
     @SerializedName("weather")
     private Weather weather;

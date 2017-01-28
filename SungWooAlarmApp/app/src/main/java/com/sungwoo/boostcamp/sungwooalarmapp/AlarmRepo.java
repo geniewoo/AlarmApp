@@ -6,7 +6,7 @@ import io.realm.annotations.PrimaryKey;
 /**
  * Created by psw10 on 2017-01-23.
  */
-
+// Realm 저장 형식 클래스
 public class AlarmRepo extends RealmObject {
     @PrimaryKey
     private int id;

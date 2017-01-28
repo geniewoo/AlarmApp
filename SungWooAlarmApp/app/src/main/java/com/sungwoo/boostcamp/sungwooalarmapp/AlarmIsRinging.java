@@ -22,7 +22,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-
+// 알람이 울릴때 notification을 눌렀을 때 보이는 페이지 이다.
 public class AlarmIsRinging extends AppCompatActivity {
     @BindView(R.id.alarmRingingStop_TV)
     TextView alarmRingingStop_TV;
@@ -30,10 +30,6 @@ public class AlarmIsRinging extends AppCompatActivity {
     TextView alarmRingingMemo_TV;
     @BindView(R.id.alarmRingingWeather_TV)
     TextView alarmRingingWeather_TV;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
     private GoogleApiClient client;
 
     @Override
@@ -58,8 +54,6 @@ public class AlarmIsRinging extends AppCompatActivity {
         alarmRingingMemo_TV.setText(intent.getStringExtra(getString(R.string.intent_alarmMemo)));
 
         setWeatherTextView();
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
@@ -79,46 +73,33 @@ public class AlarmIsRinging extends AppCompatActivity {
     }
 
     public String[] getLatLon() {
-        Log.d("LatLon", "start");
         if(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
-            Log.d("LatLon", "permission denied");
             return null;
         }
         LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
         boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         if (isGPSEnabled) {
-            Log.d("LatLon", "able");
-            Log.d("LatLon", "ok");
             locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, null);
             Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             String lat = String.valueOf(location.getLatitude());
             String lon = String.valueOf(location.getLongitude());
-            Log.d("LatLon", "lat : " + lat + " lon : " + lon);
             String[] returnStrArr={lat, lon};
             return returnStrArr;
         } else {
             boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
             if(isNetworkEnabled){
-                Log.d("LatLon2", "ok");
                 locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, null);
                 Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                 String lat = String.valueOf(location.getLatitude());
                 String lon = String.valueOf(location.getLongitude());
-                Log.d("LatLon2", "lat : " + lat + " lon : " + lon);
                 String[] returnStrArr={lat, lon};
                 return returnStrArr;
             }else{
                 Log.d("LatLon2", "unable");
             }
-            Log.d("LatLon2", "unable!");
             return null;
         }
     }
-
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
     public Action getIndexApiAction() {
         Thing object = new Thing.Builder()
                 .setName("AlarmIsRinging Page") // TODO: Define a title for the content shown.
@@ -135,8 +116,6 @@ public class AlarmIsRinging extends AppCompatActivity {
     public void onStart() {
         super.onStart();
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
         client.connect();
         AppIndex.AppIndexApi.start(client, getIndexApiAction());
     }
@@ -145,8 +124,6 @@ public class AlarmIsRinging extends AppCompatActivity {
     public void onStop() {
         super.onStop();
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
         AppIndex.AppIndexApi.end(client, getIndexApiAction());
         client.disconnect();
     }

@@ -15,7 +15,6 @@ import android.os.PowerManager;
 import android.os.Vibrator;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -26,11 +25,10 @@ import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUtil.remove_A_DayOfWeek
 /**
  * Created by psw10 on 2017-01-25.
  */
-
+// 소리, 진동, Notification을 띄우기 위한 Service클래스이다.
 public class AlarmService extends Service {
 
     private static final long[] PATTERN = {0, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000, 2000, 1000};
-    private static final String TAG = AlarmService.class.toString();
 
     private MediaPlayer mMediaPlayer;
     private Vibrator mVibrator;
@@ -44,7 +42,6 @@ public class AlarmService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String memoStr = intent.getStringExtra(getString(R.string.intent_alarmMemo));
-        Log.d(TAG, "service");
 
 
         if (!intent.getBooleanExtra(getString(R.string.intent_isStart), false)) {
@@ -66,7 +63,6 @@ public class AlarmService extends Service {
                     e.printStackTrace();
                 }
                 mMediaPlayer.start();
-                Log.d("multi", "case1");
             } else if (mMediaPlayer == null) {
                 mMediaPlayer = new MediaPlayer();
                 mMediaPlayer.setAudioStreamType(AudioManager.STREAM_ALARM);
@@ -77,10 +73,8 @@ public class AlarmService extends Service {
                     e.printStackTrace();
                 }
                 mMediaPlayer.start();
-                Log.d("multi", "case2");
             } else {
                 mMediaPlayer.start();
-                Log.d("multi", "case3");
             }
             if (mVibrator == null) {
                 mVibrator = (Vibrator) getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);

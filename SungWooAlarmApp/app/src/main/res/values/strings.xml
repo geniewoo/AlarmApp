@@ -4,8 +4,9 @@
     <string name="alarm_list_cancel">취소</string>
     <string name="alarm_list_confirm">생성</string>
     <string name="alarm_list_change">변경</string>
-    <string name="alarm_active">설정</string>
+    <string name="alarm_active">등록</string>
     <string name="alarm_inactive">해제</string>
+    <string name="alarm_activeIm">등록불가</string>
 
     <string name="day_sunday">일</string>
     <string name="day_monday">월</string>

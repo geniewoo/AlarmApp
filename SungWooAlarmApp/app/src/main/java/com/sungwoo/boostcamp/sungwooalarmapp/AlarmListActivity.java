@@ -1,7 +1,5 @@
 package com.sungwoo.boostcamp.sungwooalarmapp;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
@@ -10,19 +8,15 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.realm.Realm;
-import io.realm.RealmResults;
-
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUtil.unregistWithAlarmManager;
-
+//알람 목록을 볼 수 있는 메인페이지이다.
 public class AlarmListActivity extends AppCompatActivity {
     @BindView(R.id.alarmAddBtn)
     protected FloatingActionButton floatingActionButton;
@@ -62,7 +56,6 @@ public class AlarmListActivity extends AppCompatActivity {
             @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int index = (int)viewHolder.itemView.getTag();
-                Log.d("swipeDir", String.valueOf(swipeDir));
 
                 unregistWithAlarmManager(getApplicationContext(), mRealmList.get(index).getDayOfWeekStr(), mRealmList.get(index).getId());
                 if(realm!=null) {
@@ -98,21 +91,4 @@ public class AlarmListActivity extends AppCompatActivity {
             realm.close();
         }
     }
-    /*public void unregistWithAlarmManager(String dayOfWeekStr, int id) {
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(this, AlarmBroadcastReceiver.class);
-        intent.putExtra(getString(R.string.intent_isStart), true);
-
-        for (int i = 0; i < dayOfWeekStr.length(); i++) {
-            if (dayOfWeekStr.charAt(i) == 'O') {
-                int requestCode = id * 10 + i;
-                Log.d("multi", "adapter unregist pending requestCode : " + requestCode);
-
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                alarmManager.cancel(pendingIntent);
-            }
-        }
-    }*/
-
 }
