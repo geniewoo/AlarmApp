@@ -38,11 +38,10 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
     private static final int LIST_INDEX = 100;
 
 
-
     public AlarmListAdapter(List<AlarmRepo> alarmRepos, Realm realm) {
         this.realm = realm;
         this.alarmRepos = alarmRepos;
-        Log.d(this.toString(),"adapter" + " " + alarmRepos.size());
+        Log.d(this.toString(), "adapter" + " " + alarmRepos.size());
     }
 
     public void setRealm(Realm realm) {
@@ -51,7 +50,7 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
 
     @Override
     public AlarmListViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.d(this.toString(),"adapter onCreateViewHolder");
+        Log.d(this.toString(), "adapter onCreateViewHolder");
         mContext = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(mContext);
 
@@ -64,15 +63,15 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
 
     @Override
     public void onBindViewHolder(AlarmListViewHolder holder, int position) {
-        holder.alarmTimeTV.setText(alarmRepos.get(position).getHour() + " : " + alarmRepos.get(position).getMinute());
+        holder.alarmTimeTV.setText(add_0_(alarmRepos.get(position).getHour()) + " : " + add_0_(alarmRepos.get(position).getMinute()));
         holder.alarmTimeTV.setTag(position);
         holder.alarmTimeTV.setTag(position);
         holder.alarmActiveIV.setTag(position);
         holder.itemView.setTag(position);
         holder.alarmDayOfWeekTV.setText(alarmRepos.get(position).getDayOfWeekStr());
-        if(alarmRepos.get(position).isActive()){
+        if (alarmRepos.get(position).isActive()) {
             holder.alarmActiveIV.setImageResource(android.R.drawable.presence_away);
-        }else {
+        } else {
             holder.alarmActiveIV.setImageResource(android.R.drawable.ic_lock_idle_alarm);
         }
 
@@ -103,21 +102,21 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
         return alarmRepos.size();
     }
 
-    void changeActive(View view){
-        ImageView imageView = (ImageView)view;
-        int index = (int)view.getTag();
-        if(alarmRepos.get(index).isActive()){
+    void changeActive(View view) {
+        ImageView imageView = (ImageView) view;
+        int index = (int) view.getTag();
+        if (alarmRepos.get(index).isActive()) {
             imageView.setImageResource(android.R.drawable.ic_lock_idle_alarm);
-            if(realm!=null){
+            if (realm != null) {
                 realm.beginTransaction();
                 alarmRepos.get(index).setActive(false);
                 realm.commitTransaction();
                 Toast.makeText(mContext, mContext.getString(R.string.alarm_inactive), Toast.LENGTH_SHORT).show();
                 unregistWithAlarmManager(mContext, alarmRepos.get(index).getDayOfWeekStr(), alarmRepos.get(index).getId());
             }
-        }else {
+        } else {
             imageView.setImageResource(android.R.drawable.presence_away);
-            if(realm!=null){
+            if (realm != null) {
                 realm.beginTransaction();
                 alarmRepos.get(index).setActive(true);
                 realm.commitTransaction();
@@ -127,14 +126,14 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
         }
     }
 
-    void startChangeActivity(View view){
+    void startChangeActivity(View view) {
         Intent intent = new Intent(mContext, AlarmDetailActivity.class);
         intent.putExtra(mContext.getString(R.string.intent_isCreate), false);
-        intent.putExtra(mContext.getString(R.string.intent_alarmIndex), (int)view.getTag());
+        intent.putExtra(mContext.getString(R.string.intent_alarmIndex), (int) view.getTag());
         mContext.startActivity(intent);
     }
 
-    class AlarmListViewHolder extends RecyclerView.ViewHolder{
+    class AlarmListViewHolder extends RecyclerView.ViewHolder {
         @BindView(R.id.alarmListTime_TV)
         TextView alarmTimeTV;
         @BindView(R.id.alarmListDayOfWeek_TV)
@@ -166,44 +165,50 @@ public class AlarmListAdapter extends RecyclerView.Adapter<AlarmListAdapter.Alar
         }
     }*/
 
-   /* public void registWithAlarmManager(String dayOfWeekStr, int mId, int hour, int minute) {
-        AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(mContext, AlarmBroadcastReceiver.class);
-        intent.putExtra(mContext.getString(R.string.intent_isStart), true);
-        Log.d(TAG, "Week1Millis : " + WEEK1MILLIS + " Day1MIillis : " + DAY1MILLIS);
-        for (int i = 0; i < dayOfWeekStr.length(); i++) {
-            if (dayOfWeekStr.charAt(i) == 'O') {
-                int requestCode = mId * 10 + i;
-                Log.d("multi", "adapter regist pending requestCode : " + requestCode);
+    /* public void registWithAlarmManager(String dayOfWeekStr, int mId, int hour, int minute) {
+         AlarmManager alarmManager = (AlarmManager)mContext.getSystemService(Context.ALARM_SERVICE);
+         Intent intent = new Intent(mContext, AlarmBroadcastReceiver.class);
+         intent.putExtra(mContext.getString(R.string.intent_isStart), true);
+         Log.d(TAG, "Week1Millis : " + WEEK1MILLIS + " Day1MIillis : " + DAY1MILLIS);
+         for (int i = 0; i < dayOfWeekStr.length(); i++) {
+             if (dayOfWeekStr.charAt(i) == 'O') {
+                 int requestCode = mId * 10 + i;
+                 Log.d("multi", "adapter regist pending requestCode : " + requestCode);
 
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                 PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, requestCode, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-                Calendar calendar = Calendar.getInstance();
+                 Calendar calendar = Calendar.getInstance();
 
-                int nextDay = getNextDay(calendar, i);
+                 int nextDay = getNextDay(calendar, i);
 
-                Log.d(TAG, "nextDay : " + nextDay);
+                 Log.d(TAG, "nextDay : " + nextDay);
 
-                calendar.set(calendar.get(Calendar.YEAR),
-                        calendar.get(Calendar.MONTH),
-                        calendar.get(Calendar.DATE),
-                        hour,
-                        minute);
+                 calendar.set(calendar.get(Calendar.YEAR),
+                         calendar.get(Calendar.MONTH),
+                         calendar.get(Calendar.DATE),
+                         hour,
+                         minute);
 
-                long targetMillis = calendar.getTimeInMillis() + DAY1MILLIS * nextDay;
-                long nowMillis = System.currentTimeMillis();
+                 long targetMillis = calendar.getTimeInMillis() + DAY1MILLIS * nextDay;
+                 long nowMillis = System.currentTimeMillis();
 
-                Log.d(TAG, " targetMillies : " + targetMillis + " nowMillis : " + nowMillis);
+                 Log.d(TAG, " targetMillies : " + targetMillis + " nowMillis : " + nowMillis);
 
-                long delayMillis = targetMillis - nowMillis;
+                 long delayMillis = targetMillis - nowMillis;
 
-                if (delayMillis < 0) {
-                    targetMillis += WEEK1MILLIS;
-                }
+                 if (delayMillis < 0) {
+                     targetMillis += WEEK1MILLIS;
+                 }
 
-                alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, targetMillis, WEEK1MILLIS, pendingIntent);
-                Log.d(TAG, "Alarmregisted");
-            }
+                 alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, targetMillis, WEEK1MILLIS, pendingIntent);
+                 Log.d(TAG, "Alarmregisted");
+             }
+         }
+     }*/
+    private String add_0_(int time) {
+        if (time < 10) {
+            return "0" + time;
         }
-    }*/
+        return String.valueOf(time);
+    }
 }

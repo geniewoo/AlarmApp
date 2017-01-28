@@ -22,4 +22,12 @@
         android:textColor="#000"
         android:textAlignment="center"
         android:id="@+id/alarmRingingMemo_TV"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="32dp"
+        android:textSize="24sp"
+        android:textColor="#860"
+        android:textAlignment="center"
+        android:id="@+id/alarmRingingWeather_TV"/>
 </LinearLayout>

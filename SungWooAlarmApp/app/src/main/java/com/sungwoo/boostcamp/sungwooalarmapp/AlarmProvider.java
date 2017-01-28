@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public class AlarmProvider extends ContentProvider {
     RealmQuery<AlarmRepo> query;
     List<AlarmRepo> mAlarmRepos;
     private static final String[] columns = new String[]{"id", "hour", "minute", "dayOfWeekStr", "isActive", "memoStr"};
-    private static final String PATH = "com.sungwoo.boostcamp.sungwooalarmapp/";
+    private static final String PATH = "com.sungwoo.boostcamp.sungwooalarmapp";
 
     private static final int ALARM_FINDALL = 100;
     private static final int ALARM_INSERT = 200;
@@ -39,9 +40,12 @@ public class AlarmProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] strings, String s, String[] strings1, String s1) {
-        MatrixCursor cursor = null;
+        int matchID = sUriMatcher.match(uri);
+        Log.d("Provider", "query " + String.valueOf(matchID));
+        MatrixCursor cursor;
         switch (sUriMatcher.match(uri)) {
             case ALARM_FINDALL:
+                Log.d("Provider", "query1");
                 realm = Realm.getDefaultInstance();
                 query = realm.where(AlarmRepo.class);
                 mAlarmRepos = query.findAll();
@@ -53,6 +57,7 @@ public class AlarmProvider extends ContentProvider {
                 realm.close();
                 break;
             default:
+                Log.d("Provider", "query2, " + uri.toString());
                 return null;
         }
         return cursor;
@@ -151,10 +156,10 @@ public class AlarmProvider extends ContentProvider {
 
     private static UriMatcher makeUriMatcher() {
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI("content://", PATH + "/findall", ALARM_FINDALL);
-        uriMatcher.addURI("content://", PATH + "/insert/#/#/#/*/*/*", ALARM_INSERT);
-        uriMatcher.addURI("content://", PATH + "/delete/#", ALARM_DELETE);
-        uriMatcher.addURI("content://", PATH + "/update/#", ALARM_UPDATE);
+        uriMatcher.addURI(PATH, "findall", ALARM_FINDALL);
+        uriMatcher.addURI(PATH, "insert/#", ALARM_INSERT);
+        uriMatcher.addURI(PATH, "delete/#", ALARM_DELETE);
+        uriMatcher.addURI(PATH, "update/#", ALARM_UPDATE);
         return uriMatcher;
     }
 }

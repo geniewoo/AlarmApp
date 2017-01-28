@@ -99,8 +99,9 @@ public class AlarmService extends Service {
                         .setContentText(memoStr)
                         .addAction(getStopNotifyAction())
                         .setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_VIBRATE)
-                        .setContentIntent(pendingIntent)
-                        .setAutoCancel(true).setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
+                        .setFullScreenIntent(pendingIntent, true)
+                        .setAutoCancel(true)
+                        .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM));
                 //notificationmanager.notify(1, builder.build());
                 startForeground(1, builder.build());
             } else {

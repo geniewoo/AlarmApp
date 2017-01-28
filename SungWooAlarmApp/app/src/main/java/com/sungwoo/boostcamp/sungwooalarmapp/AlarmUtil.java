@@ -5,11 +5,17 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.widget.TextView;
 
 import java.util.Calendar;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmDetailActivity.getNextDay;
 import static com.sungwoo.boostcamp.sungwooalarmapp.AlarmUnit.DAY1MILLIS;
@@ -93,5 +99,34 @@ public class AlarmUtil {
             }
         }
         realm.close();
+    }
+
+    public static void getCurrentWeather(String lat, String lon, final TextView weatherView){
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl("http://apis.skplanetx.com")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        AlarmWeatherApi alarmWeatherApi = retrofit.create(AlarmWeatherApi.class);
+        Call<WeatherGson> weatherCall = alarmWeatherApi.getCurrentWeather(1, lat, lon);
+        weatherCall.enqueue(new Callback<WeatherGson>() {
+            @Override
+            public void onResponse(Call<WeatherGson> call, Response<WeatherGson> response) {
+                WeatherGson weatherGson = response.body();
+                if (weatherGson.getResult().getCode() != 9200 || weatherGson==null) {
+                    return;
+                }
+                String weatherStr = "";
+                WeatherGson.Weather.Minutely minutely = weatherGson.getWeather().getMinutely().get(0);
+                weatherStr += "지역 : " + minutely.getStation().getName();
+                weatherStr += " / 날씨 : " + minutely.getSky().getName();
+                weatherStr += " / 온도 : " + minutely.getTemperature().getTc() + "°C";
+                weatherView.setText(weatherStr);
+            }
+
+            @Override
+            public void onFailure(Call<WeatherGson> call, Throwable t) {
+                Log.d("WeatherApi","error");
+            }
+        });
     }
 }

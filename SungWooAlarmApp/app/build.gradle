@@ -25,6 +25,11 @@ dependencies {
 
     compile 'com.android.support:design:23.2.0'// FloatingButton Toolbar
 
-    compile 'com.jakewharton:butterknife:8.4.0'
+    compile 'com.jakewharton:butterknife:8.4.0'//ButterKnife
+
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'//Retrofit
+    compile 'com.squareup.retrofit2:converter-gson:2.0.0'
+
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'//ButterKnife
+    compile 'com.google.android.gms:play-services-appindexing:8.4.0'
 }
